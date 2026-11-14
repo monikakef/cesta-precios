@@ -1,5 +1,20 @@
 {
   "v": 1,
-  "actualizado": null,
-  "tiendas": {}
+  "actualizado": "2026-11-14T12:41:12.015Z",
+  "tiendas": {
+    "mercadona": {
+      "ok": true,
+      "ultimo_ok": "2026-11-14T12:41:12.015Z"
+    },
+    "consum": {
+      "ok": true,
+      "ultimo_ok": "2026-11-14T12:41:12.015Z"
+    },
+    "alcampo": {
+      "ok": false,
+      "ultimo_ok": null,
+      "ultimo_intento": "2026-11-14T12:41:12.015Z",
+      "error": "HTTP 403 en /categories"
+    }
+  }
 }
