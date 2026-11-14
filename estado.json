@@ -1,14 +1,14 @@
 {
   "v": 1,
-  "actualizado": "2026-11-14T12:41:12.015Z",
+  "actualizado": "2026-11-14T15:21:24.185Z",
   "tiendas": {
     "mercadona": {
       "ok": true,
-      "ultimo_ok": "2026-11-14T12:41:12.015Z"
+      "ultimo_ok": "2026-11-14T15:21:24.185Z"
     },
     "consum": {
       "ok": true,
-      "ultimo_ok": "2026-11-14T12:41:12.015Z"
+      "ultimo_ok": "2026-11-14T15:21:24.185Z"
     }
   }
 }
