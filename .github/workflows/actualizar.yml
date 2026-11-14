@@ -1,1 +1,100 @@
-{"name":"Actualizar precios","on":{"schedule":[{"cron":"17 4 * * 1"}],"workflow_dispatch":{},"push":{"paths":["scripts.zip"]}},"permissions":{"contents":"write"},"jobs":{"actualizar":{"runs-on":"ubuntu-latest","steps":[{"uses":"actions/checkout@v4"},{"uses":"actions/setup-node@v4","with":{"node-version":"22"}},{"run":"unzip -oq scripts.zip"},{"name":"Mercadona","run":"node scripts/mercadona.mjs","continue-on-error":true},{"name":"Consum","run":"node scripts/consum.mjs","continue-on-error":true},{"run":"git config user.name github-actions && git config user.email actions@github.com && git add -A -- '*.json' && (git diff --cached --quiet || (git commit -m 'Actualizar precios' && git push))"}]}}}
+name: Actualizar precios
+
+# Cada lunes descarga los catálogos de Mercadona, Consum y Alcampo y guarda los JSON en el repo.
+# Si alguna tienda falla se conserva su último JSON bueno, se anota en estado.json,
+# se abre (o actualiza) un issue "⚠️ Precios sin actualizar" y el workflow termina en rojo
+# (GitHub te avisa por correo). Cuando todo vuelve a ir bien, el issue se cierra solo.
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/**"
+      - ".github/workflows/actualizar.yml"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: actualizar-precios
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: mkdir -p logs
+
+      - name: Mercadona
+        id: mercadona
+        continue-on-error: true
+        run: set -o pipefail; node scripts/mercadona.mjs 2>&1 | tee logs/mercadona.log
+
+      - name: Consum
+        id: consum
+        continue-on-error: true
+        run: set -o pipefail; node scripts/consum.mjs 2>&1 | tee logs/consum.log
+
+      - name: Alcampo
+        id: alcampo
+        continue-on-error: true
+        run: set -o pipefail; node scripts/alcampo.mjs 2>&1 | tee logs/alcampo.log
+
+      - name: Registrar estado
+        id: estado
+        env:
+          R_MERCADONA: ${{ steps.mercadona.outcome }}
+          R_CONSUM: ${{ steps.consum.outcome }}
+          R_ALCAMPO: ${{ steps.alcampo.outcome }}
+        run: node scripts/estado.mjs
+
+      - name: Guardar cambios
+        run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+          git add -A -- '*.json'
+          git diff --cached --quiet || (git commit -m "Actualizar precios" && git push)
+
+      - name: Avisar si falla alguna tienda
+        if: steps.estado.outputs.fallos != ''
+        run: |
+          titulo="⚠️ Precios sin actualizar"
+          cuerpo="No se han podido actualizar los precios de: **${{ steps.estado.outputs.fallos }}**
+
+          $(cat logs/resumen.md)
+
+          Ejecución: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Se conservan los últimos precios buenos. Este aviso se cierra solo cuando todas las tiendas vuelvan a actualizarse."
+          n=$(gh issue list --state open --search "in:title $titulo" --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then
+            gh issue comment "$n" --body "$cuerpo"
+          else
+            gh issue create --title "$titulo" --body "$cuerpo"
+          fi
+
+      - name: Cerrar el aviso si todo va bien
+        if: steps.estado.outputs.fallos == ''
+        run: |
+          for n in $(gh issue list --state open --search "in:title ⚠️ Precios sin actualizar" --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Todas las tiendas se han actualizado correctamente."
+          done
+
+      - name: Marcar el workflow como fallido
+        if: steps.estado.outputs.fallos != ''
+        run: |
+          echo "::error::No se han actualizado: ${{ steps.estado.outputs.fallos }}"
+          exit 1
