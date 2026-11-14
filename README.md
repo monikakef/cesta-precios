@@ -6,7 +6,7 @@ Catálogos de precios de supermercados para la lista de la compra. Los JSON se r
 |---|---|---|
 | Mercadona | `mercadona.json` | `scripts/mercadona.mjs` |
 | Consum | `consum.json` | `scripts/consum.mjs` |
-| Alcampo | `alcampo.json` | `scripts/alcampo.mjs` |
+| Alcampo | `alcampo.json` | **fijo**, sin script (ver abajo) |
 
 ## Formato
 
@@ -24,9 +24,9 @@ Cada JSON: `{ "v": 1, "tienda", "actualizado", "p": [[id, nombre, precio, format
 Requiere Node 22+.
 
 ```bash
-npm run mercadona   # o consum / alcampo / todo
+npm run mercadona   # o consum / todo
 ```
 
 ## Notas
 
-- Alcampo está detrás de un AWS WAF que puede pedir una verificación anti-bots a los accesos automáticos. El script no intenta saltarla: si ocurre, falla con un mensaje claro y salta el aviso.
+- **Alcampo es un catálogo fijo** (precios de referencia del 14/11/2026, ~46.000 productos). Su web bloquea las descargas automáticas (AWS WAF con captcha), así que no se actualiza solo. Para refrescarlo hay que bajarlo a mano desde un navegador y regenerar `alcampo.json`. En el JSON, `"fijo": true` evita el aviso de "precios desactualizados" en la app, y la foto va sin el prefijo común `37ea0506-72ec-4543-93c8-a77bb916ec12/`.

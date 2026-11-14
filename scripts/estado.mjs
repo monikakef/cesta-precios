@@ -6,7 +6,7 @@
 // Salida:  estado.json, logs/resumen.md (cuerpo del aviso) y, en GitHub Actions, la salida "fallos".
 import { readFile, writeFile, appendFile, mkdir } from "node:fs/promises";
 
-const TIENDAS = ["mercadona", "consum", "alcampo"];
+const TIENDAS = ["mercadona", "consum"];
 const ahora = new Date().toISOString();
 
 async function leer(ruta, defecto) {

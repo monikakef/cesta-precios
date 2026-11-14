@@ -1,6 +1,6 @@
 name: Actualizar precios
 
-# Cada lunes descarga los catálogos de Mercadona, Consum y Alcampo y guarda los JSON en el repo.
+# Cada lunes descarga los catálogos de Mercadona y Consum (alcampo.json es fijo: ver README) y guarda los JSON en el repo.
 # Si alguna tienda falla se conserva su último JSON bueno, se anota en estado.json,
 # se abre (o actualiza) un issue "⚠️ Precios sin actualizar" y el workflow termina en rojo
 # (GitHub te avisa por correo). Cuando todo vuelve a ir bien, el issue se cierra solo.
@@ -49,17 +49,11 @@ jobs:
         continue-on-error: true
         run: set -o pipefail; node scripts/consum.mjs 2>&1 | tee logs/consum.log
 
-      - name: Alcampo
-        id: alcampo
-        continue-on-error: true
-        run: set -o pipefail; node scripts/alcampo.mjs 2>&1 | tee logs/alcampo.log
-
       - name: Registrar estado
         id: estado
         env:
           R_MERCADONA: ${{ steps.mercadona.outcome }}
           R_CONSUM: ${{ steps.consum.outcome }}
-          R_ALCAMPO: ${{ steps.alcampo.outcome }}
         run: node scripts/estado.mjs
 
       - name: Guardar cambios

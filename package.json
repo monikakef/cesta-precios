@@ -2,12 +2,13 @@
   "name": "cesta-precios",
   "private": true,
   "type": "module",
-  "description": "Precios de supermercados (Mercadona, Consum, Alcampo) para la lista de la compra",
-  "engines": { "node": ">=22" },
+  "description": "Precios de supermercados para la lista de la compra",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "mercadona": "node scripts/mercadona.mjs",
     "consum": "node scripts/consum.mjs",
-    "alcampo": "node scripts/alcampo.mjs",
-    "todo": "node scripts/mercadona.mjs; node scripts/consum.mjs; node scripts/alcampo.mjs"
+    "todo": "node scripts/mercadona.mjs; node scripts/consum.mjs"
   }
 }
