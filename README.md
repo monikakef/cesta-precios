@@ -7,6 +7,7 @@ Catálogos de precios de supermercados para la lista de la compra. Los JSON se r
 | Mercadona | `mercadona.json` | `scripts/mercadona.mjs` |
 | Consum | `consum.json` | `scripts/consum.mjs` |
 | Alcampo | `alcampo.json` | **fijo**, sin script (ver abajo) |
+| Eroski | `eroski.json` | **fijo**, sin script (ver abajo) |
 
 ## Formato
 
@@ -29,4 +30,5 @@ npm run mercadona   # o consum / todo
 
 ## Notas
 
+- **Eroski es un catálogo fijo** (14/11/2026 aprox., ~13.500 productos de alimentación; precios generales de su web, sin código postal). Se bajó a mano recorriendo las categorías de su web con pausas; las fotos van como `eroski:<código>` (`https://supermercado.eroski.es/images/<código>.jpg`).
 - **Alcampo es un catálogo fijo** (precios de referencia del 14/11/2026, ~46.000 productos). Su web bloquea las descargas automáticas (AWS WAF con captcha), así que no se actualiza solo. Para refrescarlo hay que bajarlo a mano desde un navegador y regenerar `alcampo.json`. En el JSON, `"fijo": true` evita el aviso de "precios desactualizados" en la app, y la foto va sin el prefijo común `37ea0506-72ec-4543-93c8-a77bb916ec12/`.
